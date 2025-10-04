@@ -1,3 +1,3 @@
 #!/bin/bash
 cd canteen-project
-python app.py
+python3 canteen-project/app.py
