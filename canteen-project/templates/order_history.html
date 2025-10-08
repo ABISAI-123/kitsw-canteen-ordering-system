@@ -1,0 +1,46 @@
+{% extends "base_new.html" %}
+{% block title %}Order History{% endblock %}
+{% block content %}
+<h3>Order History</h3>
+<p>Total Spent (Paid orders): ₹{{ total_spent }}</p>
+<table class="table table-striped">
+  <thead><tr><th>ID</th><th>Item</th><th>Price</th><th>Pickup</th><th>Status</th><th>Payment</th><th>Action</th></tr></thead>
+  <tbody>
+    {% for o in orders %}
+      <tr>
+        <td>{{ o.id }}</td>
+        <td>{{ o.item_name }}</td>
+        <td>₹{{ o.total_price }}</td>
+        <td>{{ o.pickup_time }}</td>
+        <td>{{ o.status }}</td>
+        <td>{{ o.payment_status }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('order_receipt', order_id=o.id) }}">View</a>
+          {% if o.status == 'Pending' %}
+            <button class="btn btn-sm btn-danger cancel-btn" data-id="{{ o.id }}">Cancel</button>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+document.querySelectorAll('.cancel-btn').forEach(btn=>{
+  btn.addEventListener('click', async ()=> {
+    const id = btn.dataset.id;
+    if (!confirm('Cancel this pending order?')) return;
+    const res = await fetch('/order/cancel/' + id, { method: 'POST' });
+    const j = await res.json();
+    if (j.ok) location.reload(); else alert(j.error || 'Unable to cancel');
+  });
+});
+
+// polling to keep UI updated
+setInterval(async ()=> {
+  const res = await fetch('/api/orders');
+  const data = await res.json();
+  // We won't auto-update UI live here to keep it simple. User can refresh if needed.
+}, 5000);
+</script>
+{% endblock %}
