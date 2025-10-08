@@ -1,61 +1,64 @@
 {% extends "base_new.html" %}
 {% block content %}
 <div class="container mt-4">
-  <h2 class="mb-4 text-center">Manage Orders</h2>
+    <h2 class="mb-4 text-center">Manage Orders</h2>
 
-  <!-- Filter Buttons -->
-  <div class="text-center mb-3">
-    <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-secondary btn-sm {% if not request.args.get('status') %}active{% endif %}">All</a>
-    <a href="{{ url_for('admin_orders', status='Pending') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Pending' %}active{% endif %}">Pending</a>
-    <a href="{{ url_for('admin_orders', status='Preparing') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Preparing' %}active{% endif %}">Preparing</a>
-    <a href="{{ url_for('admin_orders', status='Ready') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Ready' %}active{% endif %}">Ready</a>
-    <a href="{{ url_for('admin_orders', status='Completed') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Completed' %}active{% endif %}">Completed</a>
-  </div>
+    <!-- Filter Buttons -->
+    <div class="text-center mb-3">
+        <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-secondary btn-sm {% if not request.args.get('status') %}active{% endif %}">All</a>
+        <a href="{{ url_for('admin_orders', status='Pending') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Pending' %}active{% endif %}">Pending</a>
+        <a href="{{ url_for('admin_orders', status='Preparing') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Preparing' %}active{% endif %}">Preparing</a>
+        <a href="{{ url_for('admin_orders', status='Ready') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Ready' %}active{% endif %}">Ready</a>
+        <a href="{{ url_for('admin_orders', status='Completed') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Completed' %}active{% endif %}">Completed</a>
+    </div>
 
-  <!-- Orders Table -->
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle">
-      <thead class="table-dark text-center">
-        <tr>
-          <th>ID</th>
-          <th>Student</th>
-          <th>Items</th>
-          <th>Total Price (₹)</th>
-          <th>Status</th>
-          <th>Update Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for order in orders %}
-        <tr>
-          <td>{{ order.id }}</td>
-          <td>{{ order.user.username }}</td>
-          <td>
-            {% for item in order.items %}
-              {{ item.menu_item.name }} (x{{ item.quantity }})<br>
-            {% endfor %}
-          </td>
-          <td>{{ order.total_price }}</td>
-          <td class="text-center">{{ order.status }}</td>
-          <td class="text-center">
-            <form method="POST" action="{{ url_for('admin_update_order') }}" class="d-flex justify-content-center align-items-center gap-2">
-              <input type="hidden" name="order_id" value="{{ order.id }}">
-              <select name="status" class="form-select form-select-sm w-auto">
-                <option value="Pending" {% if order.status=='Pending' %}selected{% endif %}>Pending</option>
-                <option value="Preparing" {% if order.status=='Preparing' %}selected{% endif %}>Preparing</option>
-                <option value="Ready" {% if order.status=='Ready' %}selected{% endif %}>Ready</option>
-                <option value="Completed" {% if order.status=='Completed' %}selected{% endif %}>Completed</option>
-                <option value="Cancelled" {% if order.status=='Cancelled' %}selected{% endif %}>Cancelled</option>
-              </select>
-              <button type="submit" class="btn btn-sm btn-primary">Update</button>
-            </form>
-          </td>
-        </tr>
-        {% else %}
-        <tr><td colspan="6" class="text-center text-muted">No orders found</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+    <!-- Orders Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th>ID</th>
+                    <th>Student</th>
+                    <th>Items</th>
+                    <th>Total Price (₹)</th>
+                    <th>Update Status</th>
+                    <th>Current Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td>
+                            {% for item in order.items %}
+                                {{ item.menu_item.name }} (x{{ item.quantity }})<br>
+                            {% endfor %}
+                        </td>
+                        <td>{{ order.total_price }}</td>
+                        <td class="text-center">
+                            <form method="POST" action="{{ url_for('admin_update_order') }}" class="d-flex justify-content-center gap-2">
+                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                <select name="status" class="form-select form-select-sm w-auto">
+                                    <option value="Pending" {% if order.status=='Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="Preparing" {% if order.status=='Preparing' %}selected{% endif %}>Preparing</option>
+                                    <option value="Ready" {% if order.status=='Ready' %}selected{% endif %}>Ready</option>
+                                    <option value="Completed" {% if order.status=='Completed' %}selected{% endif %}>Completed</option>
+                                    <option value="Cancelled" {% if order.status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                            </form>
+                        </td>
+                        <td class="text-center">{{ order.status }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">No orders found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
+
