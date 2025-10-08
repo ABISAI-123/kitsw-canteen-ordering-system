@@ -22,7 +22,7 @@
           <th>Items</th>
           <th>Total Price (₹)</th>
           <th>Status</th>
-          <th>Update</th>
+          <th>Update Status</th>
         </tr>
       </thead>
       <tbody>
@@ -36,7 +36,8 @@
             {% endfor %}
           </td>
           <td>{{ order.total_price }}</td>
-          <td>
+          <td class="text-center">{{ order.status }}</td>
+          <td class="text-center">
             <form method="POST" action="{{ url_for('admin_update_order') }}" class="d-flex justify-content-center align-items-center gap-2">
               <input type="hidden" name="order_id" value="{{ order.id }}">
               <select name="status" class="form-select form-select-sm w-auto">
@@ -49,8 +50,9 @@
               <button type="submit" class="btn btn-sm btn-primary">Update</button>
             </form>
           </td>
-          <td class="text-center">{{ order.status }}</td>
         </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted">No orders found</td></tr>
         {% endfor %}
       </tbody>
     </table>
