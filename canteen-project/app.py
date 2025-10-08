@@ -304,27 +304,46 @@ def admin_toggle_menu(item_id):
 def admin_orders():
     if not is_logged_in() or not is_admin():
         return redirect(url_for('login'))
-    # Allow filtering
+
+    # Allow filtering by status
     status = request.args.get('status', None)
-    if status:
-        orders = Order.query.filter_by(status=status).order_by(Order.created_at.desc()).all()
-    else:
-        orders = Order.query.order_by(Order.created_at.desc()).all()
+
+    try:
+        if status:
+            orders = Order.query.filter_by(status=status).order_by(Order.created_at.desc()).all()
+        else:
+            orders = Order.query.order_by(Order.created_at.desc()).all()
+    except Exception as e:
+        flash("Error fetching orders: " + str(e), "danger")
+        orders = []
+
     return render_template('admin_orders.html', orders=orders, filter_status=status)
+
 
 @app.route('/admin/orders/update', methods=['POST'])
 def admin_update_order():
     if not is_logged_in() or not is_admin():
         return redirect(url_for('login'))
+
     oid = request.form.get('order_id')
     new_status = request.form.get('status')
+
     if oid and new_status:
-        o = Order.query.get(int(oid))
-        if o:
-            o.status = new_status
-            db.session.commit()
-            flash("Order status updated", "success")
+        try:
+            oid = int(oid)
+            order = Order.query.get(oid)
+            if order:
+                order.status = new_status
+                db.session.commit()
+                flash("Order status updated successfully", "success")
+            else:
+                flash("Order not found", "warning")
+        except Exception as e:
+            db.session.rollback()
+            flash("Failed to update order: " + str(e), "danger")
+
     return redirect(url_for('admin_orders'))
+
 
 # ---------- Feedback ----------
 @app.route('/feedback/<int:item_id>', methods=['POST'])
@@ -388,3 +407,4 @@ if __name__ == '__main__':
         init_db()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
