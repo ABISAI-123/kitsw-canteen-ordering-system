@@ -1,22 +1,58 @@
 {% extends "base_new.html" %}
 {% block content %}
-<h2>Manage Menu</h2>
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">Manage Menu</h2>
 
-<form method="POST" style="max-width:700px;margin-bottom:20px;">
-  <input type="text" name="name" placeholder="Item name" required>
-  <input type="number" name="price" placeholder="Price" step="0.01" required>
-  <button class="btn btn-primary" type="submit">Add Item</button>
-</form>
-
-<div class="menu-grid">
-  {% for item in items %}
-  <div class="card">
-    <h3>{{ item.name }}</h3>
-    <p class="price">₹{{ item.price }}</p>
-    <p>Status: {% if item.available %}<span style="color:green">Available</span>{% else %}<span style="color:red">Out</span>{% endif %}</p>
-    <a href="{{ url_for('admin_toggle_menu', item_id=item.id) }}" class="btn">Toggle Availability</a>
+  <!-- Add New Menu Item -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-dark text-white">Add New Item</div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('admin_menu') }}" class="row g-3">
+        <div class="col-md-4">
+          <input type="text" name="name" class="form-control" placeholder="Item Name" required>
+        </div>
+        <div class="col-md-2">
+          <input type="number" step="0.01" name="price" class="form-control" placeholder="Price (₹)" required>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">Available From</label>
+          <input type="time" name="available_from" class="form-control">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">Available To</label>
+          <input type="time" name="available_to" class="form-control">
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="submit" class="btn btn-success">Add Item</button>
+        </div>
+      </form>
+    </div>
   </div>
-  {% endfor %}
+
+  <!-- Menu Items Table -->
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered align-middle">
+      <thead class="table-dark text-center">
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Price (₹)</th>
+          <th>Available From</th>
+          <th>Available To</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in menu %}
+        <tr class="text-center">
+          <td>{{ item.id }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.price }}</td>
+          <td>{{ item.available_from if item.available_from else '-' }}</td>
+          <td>{{ item.available_to if item.available_to else '-' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}
-
