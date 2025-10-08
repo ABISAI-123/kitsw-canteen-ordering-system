@@ -6,7 +6,7 @@
   {% for entry in items %}
     {% set it = entry.item %}
     <div class="col-md-4 mb-3">
-      <div class="card p-3 {% if body.classList and body.classList.contains('dark') %}dark{% endif %}">
+      <div class="card p-3">
         <h5>{{ it.name }}</h5>
         <p>₹{{ it.price }}</p>
         <p>
@@ -57,6 +57,3 @@
   {% endfor %}
 </div>
 {% endblock %}
-
-
-
