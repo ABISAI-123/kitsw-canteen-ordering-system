@@ -1,54 +1,59 @@
 {% extends "base_new.html" %}
 {% block content %}
-<h2>All Orders (Live)</h2>
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">Manage Orders</h2>
 
-<div id="admin-orders">Loading orders…</div>
+  <!-- Filter Buttons -->
+  <div class="text-center mb-3">
+    <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-secondary btn-sm {% if not request.args.get('status') %}active{% endif %}">All</a>
+    <a href="{{ url_for('admin_orders', status='Pending') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Pending' %}active{% endif %}">Pending</a>
+    <a href="{{ url_for('admin_orders', status='Preparing') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Preparing' %}active{% endif %}">Preparing</a>
+    <a href="{{ url_for('admin_orders', status='Ready') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Ready' %}active{% endif %}">Ready</a>
+    <a href="{{ url_for('admin_orders', status='Completed') }}" class="btn btn-outline-secondary btn-sm {% if request.args.get('status')=='Completed' %}active{% endif %}">Completed</a>
+  </div>
 
-<script>
-async function fetchAdminOrders() {
-  const res = await fetch('/api/admin/orders');
-  if (!res.ok) return;
-  const data = await res.json();
-  const container = document.getElementById('admin-orders');
-  if (!data.length) {
-    container.innerHTML = '<div class="card">No orders yet.</div>';
-    return;
-  }
-  let html = '';
-  data.forEach(o => {
-    html += `
-      <div class="card">
-        <h3>Order #${o.id} — ${o.item_name}</h3>
-        <p><strong>User:</strong> ${o.username}</p>
-        <p><strong>Pickup:</strong> ${o.pickup_time}</p>
-        <p><strong>Total:</strong> ₹${o.total_price}</p>
-        <p><strong>Status:</strong> ${o.status}</p>
-        <div style="margin-top:8px">
-          <form method="POST" action="/admin/orders" style="display:inline-block; margin-right:6px;">
-            <input type="hidden" name="order_id" value="${o.id}">
-            <input type="hidden" name="status" value="Preparing">
-            <button class="btn btn-secondary" type="submit">Preparing</button>
-          </form>
-          <form method="POST" action="/admin/orders" style="display:inline-block; margin-right:6px;">
-            <input type="hidden" name="order_id" value="${o.id}">
-            <input type="hidden" name="status" value="Ready">
-            <button class="btn btn-primary" type="submit">Ready</button>
-          </form>
-          <form method="POST" action="/admin/orders" style="display:inline-block;">
-            <input type="hidden" name="order_id" value="${o.id}">
-            <input type="hidden" name="status" value="Completed">
-            <button class="btn btn-secondary" type="submit">Completed</button>
-          </form>
-        </div>
-      </div>
-    `;
-  });
-  container.innerHTML = html;
-}
-
-// initial + poll
-fetchAdminOrders();
-setInterval(fetchAdminOrders, 5000);
-</script>
+  <!-- Orders Table -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+      <thead class="table-dark text-center">
+        <tr>
+          <th>ID</th>
+          <th>Student</th>
+          <th>Items</th>
+          <th>Total Price (₹)</th>
+          <th>Status</th>
+          <th>Update</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td>{{ order.id }}</td>
+          <td>{{ order.user.username }}</td>
+          <td>
+            {% for item in order.items %}
+              {{ item.menu_item.name }} (x{{ item.quantity }})<br>
+            {% endfor %}
+          </td>
+          <td>{{ order.total_price }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('admin_update_order') }}" class="d-flex justify-content-center align-items-center gap-2">
+              <input type="hidden" name="order_id" value="{{ order.id }}">
+              <select name="status" class="form-select form-select-sm w-auto">
+                <option value="Pending" {% if order.status=='Pending' %}selected{% endif %}>Pending</option>
+                <option value="Preparing" {% if order.status=='Preparing' %}selected{% endif %}>Preparing</option>
+                <option value="Ready" {% if order.status=='Ready' %}selected{% endif %}>Ready</option>
+                <option value="Completed" {% if order.status=='Completed' %}selected{% endif %}>Completed</option>
+                <option value="Cancelled" {% if order.status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+              </select>
+              <button type="submit" class="btn btn-sm btn-primary">Update</button>
+            </form>
+          </td>
+          <td class="text-center">{{ order.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}
-
