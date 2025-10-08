@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_new.html" %}
 {% block content %}
 <h2>Welcome, {{ session['username'] }}</h2>
 <p>Browse the menu and place your orders. Your orders update automatically.</p>
@@ -43,3 +43,4 @@ fetchUserOrders();
 setInterval(fetchUserOrders, 5000);
 </script>
 {% endblock %}
+
