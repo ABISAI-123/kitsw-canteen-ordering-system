@@ -1,0 +1,24 @@
+{% extends "base_new.html" %}
+{% block title %}Payment{% endblock %}
+{% block content %}
+<div class="card mx-auto" style="max-width:420px;">
+  <div class="card-body text-center">
+    <h5>Select Payment Method</h5>
+    <p>Amount: <strong>₹{{ amount }}</strong></p>
+    <form method="post">
+      <div class="mb-3">
+        <select class="form-select" name="method" required>
+          <option value="">-- Choose --</option>
+          <option value="UPI (PhonePe)">UPI (PhonePe)</option>
+          <option value="UPI (Paytm)">UPI (Paytm)</option>
+          <option value="Card (Visa/Master)">Credit / Debit Card</option>
+          <option value="Cash">Cash on Pickup</option>
+        </select>
+      </div>
+      <button class="btn btn-primary w-100">Pay ₹{{ amount }} (dummy)</button>
+    </form>
+    <hr>
+    <p class="text-muted small">This is a simulated payment for demo only — no money will be charged.</p>
+  </div>
+</div>
+{% endblock %}
