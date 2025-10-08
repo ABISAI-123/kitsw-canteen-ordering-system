@@ -23,10 +23,15 @@
       </div>
       {% if session.get('username') %}
         <span class="me-2">Hi, {{ session['username'] }}</span>
-        <a class="btn btn-outline-primary btn-sm me-2" href="{{ url_for('order_history') }}">My Orders</a>
+
+        {% if session.get('role') != 'admin' %}
+          <a class="btn btn-outline-primary btn-sm me-2" href="{{ url_for('order_history') }}">My Orders</a>
+        {% endif %}
+
         {% if session.get('role') == 'admin' %}
           <a class="btn btn-danger btn-sm me-2" href="{{ url_for('admin_dashboard') }}">Admin</a>
         {% endif %}
+
         <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('logout') }}">Logout</a>
       {% else %}
         <a class="btn btn-primary btn-sm" href="{{ url_for('login') }}">Login</a>
@@ -34,7 +39,6 @@
     </div>
   </div>
 </nav>
-
 <div class="container my-4" id="page">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
