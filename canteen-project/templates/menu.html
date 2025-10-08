@@ -1,19 +1,62 @@
 {% extends "base_new.html" %}
+{% block title %}Menu{% endblock %}
 {% block content %}
 <h2>Menu</h2>
+<div class="row">
+  {% for entry in items %}
+    {% set it = entry.item %}
+    <div class="col-md-4 mb-3">
+      <div class="card p-3 {% if body.classList and body.classList.contains('dark') %}dark{% endif %}">
+        <h5>{{ it.name }}</h5>
+        <p>₹{{ it.price }}</p>
+        <p>
+          {% if entry.available_now %}
+            <span class="badge bg-success">Available</span>
+          {% else %}
+            <span class="badge bg-secondary">Not available now</span>
+          {% endif %}
+          {% if it.available_from and it.available_to %}
+            <small class="text-muted"> ({{ it.available_from }} - {{ it.available_to }})</small>
+          {% endif %}
+        </p>
+        <p>
+          {% if entry.avg_rating %}
+            ⭐ {{ entry.avg_rating }} / 5
+          {% else %}
+            <small class="text-muted">No ratings yet</small>
+          {% endif %}
+        </p>
+        <div class="d-flex gap-2">
+          {% if entry.available_now %}
+            <a class="btn btn-sm btn-primary" href="{{ url_for('order_form', item_id=it.id) }}">Order</a>
+          {% else %}
+            <button class="btn btn-sm btn-outline-secondary" disabled>Order</button>
+          {% endif %}
+          <a class="btn btn-sm btn-outline-info" href="#" data-bs-toggle="collapse" data-bs-target="#rate-{{ it.id }}">Rate</a>
+        </div>
 
-<div class="menu-grid">
-  {% for item in items %}
-  <div class="card">
-    <h3>{{ item.name }}</h3>
-    <p class="price">₹{{ item.price }}</p>
-    {% if item.available %}
-      <a class="btn btn-primary" href="{{ url_for('order_form', item_id=item.id) }}">Order</a>
-    {% else %}
-      <p style="color:red;font-weight:600">Out of Stock</p>
-    {% endif %}
-  </div>
+        <div class="collapse mt-2" id="rate-{{ it.id }}">
+          <form method="post" action="{{ url_for('submit_feedback', item_id=it.id) }}">
+            <div class="mb-2">
+              <label>Rating</label>
+              <select class="form-select" name="rating" required>
+                <option value="">--select--</option>
+                {% for r in range(5,0,-1) %}
+                <option value="{{ r }}">{{ r }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-2">
+              <textarea name="comment" class="form-control" placeholder="Optional comment"></textarea>
+            </div>
+            <button class="btn btn-sm btn-success">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
   {% endfor %}
 </div>
 {% endblock %}
+
+
 
